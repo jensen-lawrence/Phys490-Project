@@ -3,6 +3,8 @@ Main paper: https://arxiv.org/pdf/2011.04418.pdf
 
 Data generation reference paper: https://journals.aps.org/prd/pdf/10.1103/PhysRevD.100.063015
 
+Package provided by reference paper: https://github.com/timothygebhard/ggwd
+
 LALSuite documentation: https://lscsoft.docs.ligo.org/lalsuite/
 
 LALSimulation repo: https://git.ligo.org/lscsoft/lalsuite/-/tree/master/lalsimulation
