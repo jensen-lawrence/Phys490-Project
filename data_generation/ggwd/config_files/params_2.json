@@ -1,0 +1,12 @@
+{
+  "random_seed": 42,
+  "background_data_directory": null,
+  "dq_bits": [0, 1, 2, 3],
+  "inj_bits": [0, 1, 2, 4],
+  "waveform_params_file_name": "params_2.ini",
+  "max_runtime": 60,
+  "n_injection_samples": 2500,
+  "n_noise_samples": 2500,
+  "n_processes": 4,
+  "output_file_name": "data_2.hdf"
+}

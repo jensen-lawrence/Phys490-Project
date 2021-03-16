@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # -------------------------------------------------------------------------
 
     # Disable output buffering ('flush' option is not available for Python 2)
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
     # Start the stopwatch
     script_start = time.time()
