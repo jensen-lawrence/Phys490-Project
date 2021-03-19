@@ -7,33 +7,8 @@ import h5py
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Extraction and Labelling of Data
+# Array Operations
 # ----------------------------------------------------------------------------------------------------------------------
-
-def _extract_data(hdf5_file, site):
-    """
-    _extract_data : str, str -> numpy.array, numpy.array
-        Extracts gravitational wave signal data and noise data from a .hdf5 file containing gravitational wave
-        simulation data produced by ggwd. Returns the array containing the gravitational wave signal data and the
-        array containing the noise data.
-
-    hdf5_file : str
-        Path to the .hdf5 file containing the gravitational wave simulation data.
-
-    site : str
-        Specifies the site whose signals will be used. Options are 'Hanford' and 'Livingston'.
-    """
-    if site == 'Hanford':
-        strain = 'h1_strain'
-    elif site == 'Livingston':
-        strain = 'l1_strain'
-
-    with h5py.File(hdf5_file, 'r') as f:
-        gw_data = np.array(f['injection_samples'][strain])
-        noise_data = np.array(f['noise_samples'][strain])
-    f.close()
-    return gw_data, noise_data
-
 
 def _label_array(array, label):
     """
@@ -54,9 +29,23 @@ def _label_array(array, label):
     return classified
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Random Combination of Two Arrays
-# ----------------------------------------------------------------------------------------------------------------------
+def _data_label_split(array):
+    """
+    _data_label_split : numpy.array -> numpy.array, numpy.array
+        Splits an array of arrays into two arrays, where the elements of the first array are the arrays from the
+        original array with their final elements removed, and the elements of the second array are the final elements
+        of each of the arrays in the original array. Returns the array of non-final element arrays and the array of
+        final elements.
+
+    array : numpy.array
+        The array of arrays to be split.
+    """
+    data = np.zeros((array.shape[0], array.shape[1] - 1))
+    labels = np.zeros((array.shape[0], 1))
+    data = array[:,:-1]
+    labels = array[:,-1]
+    return data, labels
+
 
 def _two_array_shuffle(array1, array2):
     """
@@ -105,25 +94,33 @@ def _two_array_shuffle(array1, array2):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Generation of Usable Datasets
+# Data Extraction
 # ----------------------------------------------------------------------------------------------------------------------
 
-def _data_label_split(array):
+def _extract_data(hdf5_file, site):
     """
-    _data_label_split : numpy.array -> numpy.array, numpy.array
-        Splits an array of arrays into two arrays, where the elements of the first array are the arrays from the
-        original array with their final elements removed, and the elements of the second array are the final elements
-        of each of the arrays in the original array. Returns the array of non-final element arrays and the array of
-        final elements.
+    _extract_data : str, str -> numpy.array, numpy.array
+        Extracts gravitational wave signal data and noise data from a .hdf5 file containing gravitational wave
+        simulation data produced by ggwd. Returns the array containing the gravitational wave signal data and the
+        array containing the noise data.
 
-    array : numpy.array
-        The array of arrays to be split.
+    hdf5_file : str
+        Path to the .hdf5 file containing the gravitational wave simulation data.
+
+    site : str
+        Specifies the site whose signals will be used. Options are 'Hanford' and 'Livingston'.
     """
-    data = np.zeros((array.shape[0], array.shape[1] - 1))
-    labels = np.zeros((array.shape[0], 1))
-    data = array[:,:-1]
-    labels = array[:,-1]
-    return data, labels
+    assert (site == 'Hanford') or (site == 'Livingston'), 'Invalid site chosen.'
+    if site == 'Hanford':
+        strain = 'h1_strain'
+    elif site == 'Livingston':
+        strain = 'l1_strain'
+
+    with h5py.File(hdf5_file, 'r') as f:
+        gw_data = np.array(f['injection_samples'][strain])
+        noise_data = np.array(f['noise_samples'][strain])
+    f.close()
+    return gw_data, noise_data
 
 
 def get_nn_data(hdf5_file, site):
