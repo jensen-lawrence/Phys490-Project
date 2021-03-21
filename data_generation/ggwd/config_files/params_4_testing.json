@@ -3,10 +3,10 @@
   "background_data_directory": null,
   "dq_bits": [0, 1, 2, 3],
   "inj_bits": [0, 1, 2, 4],
-  "waveform_params_file_name": "params_5.ini",
+  "waveform_params_file_name": "params_4_testing.ini",
   "max_runtime": 60,
   "n_injection_samples": 5000,
   "n_noise_samples": 5000,
   "n_processes": 4,
-  "output_file_name": "data_5.hdf"
+  "output_file_name": "data_4_testing.hdf"
 }
