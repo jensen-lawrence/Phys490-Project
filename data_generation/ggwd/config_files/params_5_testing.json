@@ -8,5 +8,5 @@
   "n_injection_samples": 313,
   "n_noise_samples": 313,
   "n_processes": 4,
-	"output_file_name": "data_5_testing_snr=8.0.hdf"
+	"output_file_name": "data_5_testing_snr=8.5.hdf"
 }
