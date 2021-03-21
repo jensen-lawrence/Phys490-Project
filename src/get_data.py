@@ -123,7 +123,7 @@ def _extract_data(hdf5_file, site):
     return gw_data, noise_data
 
 
-def get_data(hdf5_file, site):
+def get_data(hdf5_file, site='Hanford'):
     """
     get_nn_data : str, str -> numpy.array, numpy.array
         Extracts the signal data from a .hdf5 file containing gravitational wave simulation data produced by ggwd, and
