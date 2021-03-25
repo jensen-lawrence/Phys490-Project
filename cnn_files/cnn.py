@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Description goes here')
     parser.add_argument('--param', type='str')
     parser.add_argument('--data', type='str')
+    parser.add_argument('-v', type=int)
 
     with open(args.param) as f:
         nn_params = json.load(f)
