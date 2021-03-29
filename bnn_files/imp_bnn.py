@@ -1,11 +1,12 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-
+import sys
+sys.path.append('../src')
+from get_data import get_data
 import json
 import argparse
 import blitz
-import get_data as gd
 import numpy as np
 from blitz.utils import variational_estimator
 from bnn import bnn
