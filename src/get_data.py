@@ -2,6 +2,7 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 
+import os
 import numpy as np 
 import h5py
 
@@ -123,9 +124,9 @@ def _extract_data(hdf5_file, site):
     return gw_data, noise_data
 
 
-def get_data(hdf5_file, site='Hanford'):
+def _get_data_from_file(hdf5_file, site='Hanford'):
     """
-    get_nn_data : str, str -> numpy.array, numpy.array
+    _get_data_from_file : str, str -> numpy.array, numpy.array
         Extracts the signal data from a .hdf5 file containing gravitational wave simulation data produced by ggwd, and
         converts the data to a form usable for training neural networks. Returns an array containing the signal data
         and an array containing the label corresponding to each signal (0 for noise, 1 for gravitational wave).
@@ -142,6 +143,40 @@ def get_data(hdf5_file, site='Hanford'):
     signal_data = _two_array_shuffle(labelled_gw_data, labelled_noise_data)
     signals, labels = _data_label_split(signal_data)
     return signals, labels
+
+
+def get_data(files_path, n_output, site='Hanford'):
+    """
+    get_data : str, int, str -> numpy.array, numpy.array
+        Extracts the signal data from each .hdf5 file in file_paths containing gravitational wave simulation data
+        produced by ggwd, and converts the data to a form usable for training in neural networks. Returns an array
+        containing the signal data and an array containing to the label corresponding to each signal (0 for noise,
+        1 for gravitational wave).
+
+    files_path : str
+        Path to the directory containing the .hdf5 files containing the gravitational wave simulation data.
+
+    n_output : int
+        The number of signals to be included in the output.
+
+    site : str
+        Specifies the site whose signals will be used. Options are 'Hanford' and 'Livingston'.
+    """
+    files_list = os.listdir(files_path)
+    data_files = [file for file in files_list if file.split('.')[-1] in ['hdf', 'hdf5', 'h5', 'he5']]
+    signals_list = [_get_data_from_file(path + f'\\{file}')[0] for file in files_list]
+    labels_list = [_get_data_from_file(path + f'\\{file}')[1] for file in files_list]
+    all_signals = np.concatenate(signals_list)
+    all_labels = np.concatenate(labels_list)
+
+    n_tot = all_signals.shape[0]
+    n_del = n_tot - n_output
+    assert n_del >= 0, 'Too many signals requested.'
+    del_indices = np.random.choice(n_tot, n_del, replace=False)
+    all_signals = np.delete(all_signals, del_indices, 0)
+    all_labels = np.delete(all_labels, del_indices, 0)
+
+    return all_signals, all_labels
 
 
 # ----------------------------------------------------------------------------------------------------------------------
