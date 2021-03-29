@@ -4,17 +4,11 @@
 
 import json
 import argparse
+import blitz
+import get_data as gd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import normalizer
-from tensorflow.keras import Sequential
-import tensorflow.keras.layers as layers
-from bnn import bnn
 from blitz.utils import variational_estimator
-from sklearn.datasets import load_boston
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from get_data import get_data
+from bnn import bnn
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -22,10 +16,19 @@ from get_data import get_data
 # ----------------------------------------------------------------------------------------------------------------------
 
 def run(param, train_in, train_out):
+
+    lr = param['learn_rate']
+    batch_size = param['batch_size']
+    num_epoch = param['num_epoch']
+    display_epoch = param['display_epoch']
+    in_dim = train_in.shape[0]
+    out_dim = train_out.shape[0]
+    sample_nbr = 3
+
     
-    model = BayesianRegressor(in_dim, out_dim)
-    optimizer = optim.SGD(regressor.parameters(), lr)
-    loss_func = torch.nn.MSELoss()
+    model = bnn(in_dim, out_dim)
+    optimizer = optim.SGD(model.parameters(), lr)
+    loss_func = torch.nn.CrossEntropyLoss()
 
     train = torch.utils.data.TensorDataset(train_in, train_out)
     dataloader_train = torch.utils.data.DataLoader(train, batch_size)
@@ -33,15 +36,17 @@ def run(param, train_in, train_out):
  
 
     for epoch in range(num_epoch):
-        optimizer.zero_grad()
-            
-        loss = regressor.sample_elbo(inputs=datapoints, labels=labels, criterion=loss_func, sample_nbr=3)
-        loss.backward()
-        optimizer.step()
-            
+        for i, (signals_t, labels_t) in enumerate(train_loader):
+            out = model.forward(signals_t)
+            optimizer.zero_grad()
+                
+            loss = model.sample_elbo(signals_t, labels_t, loss_func, sample_nbr)
+            loss.backward()
+            optimizer.step()
+                
 
-        if epoch%display_epoch==1:
-            print("Loss: {:.4f}".format(loss))
+            if epoch%display_epoch==1:
+                print("Loss: {:.4f}".format(loss))
     
     print("Final Loss: {:.4f}".format(loss))
 
@@ -51,13 +56,13 @@ def run(param, train_in, train_out):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Description goes here')
-    parser.add_argument('--param', type='str')
-    parser.add_argument('--data', type='str')
+    parser.add_argument('--param', type='str', help='Path where Params are stored')
+    parser.add_argument('--data', type='str', help='Path where data is stored')
 
     with open(args.param) as f:
-        nn_params = json.load(f)
+        params = json.load(f)
     f.close()
 
-    data_in, data_out = get_data()
-    run(nn_params, data_in, data_out)
+    signals, labels = gd.get_data(args.data, 500)
+    run(params, signals, labels)
 

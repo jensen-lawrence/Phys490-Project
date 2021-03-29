@@ -2,12 +2,13 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 
+import blitz
 import numpy as numpy
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as functional
 import torch.optim as optim
-from blitz.modules import BayesianLinear
+from blitz.modules import BayesianLinear, BayesianCov1d
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,18 +17,31 @@ from blitz.modules import BayesianLinear
 
 class bnn(nn.Module):
 
-    def __init__(self, input_dim, output_dim):
+    def __init__(self):
         super().__init__()
-        self.linear = nn.Linear(input_dim, output_dim)
-        self.blinear1 = BayesianLinear(input_dim, 80)
-        self.blinear2 = BayesianLinear(80, output_dim)
-        
+        self.conv1 = BayesianConv1d(16, (16, 16))
+        self.conv2 = BayesianConv1d(32, (8,8))
+        self.conv3 = BayesianConv1d(64, (8,8))
+        self.fc1   = BayesianLinear(256, 120)
+        self.fc2   = BayesianLinear(120, 84)
+        self.fc3   = BayesianLinear(84, 10)
+
     def forward(self, x):
-        x_ = self.linear(x)
-        x_ = self.blinear1(x_)
-        return self.blinear2(x_)
+        out = F.relu(self.conv1(x))
+        out = F.max_pool2d(4, 4)
+        out = F.relu(self.conv2(out))
+        out = F.max_pool2d(4, 4)
+        out = out.view(out.size(0), -1)
+        out = F.relu(self.fc1(out))
+        out = F.relu(self.fc2(out))
+        out = self.fc3(out)
+        return out
 
     
     def reset(self):
+        self.conv1.reset_parameters()
+        self.conv2.reset_parameters()
+        self.conv3.reset_parameters()
         self.fc1.reset_parameters()
         self.fc2.reset_parameters()
+        self.fc3.reset_parameters()
