@@ -3,12 +3,13 @@
 # ----------------------------------------------------------------------------------------------------------------------
 import sys
 sys.path.append('../src')
-from get_data import get_data
+import get_data
 import json
 import argparse
 import blitz
 import numpy as np
 from blitz.utils import variational_estimator
+from sklearn.model_selection import train_test_split
 from bnn import bnn
 
 
@@ -16,7 +17,7 @@ from bnn import bnn
 # Run Data Through BNN model
 # ----------------------------------------------------------------------------------------------------------------------
 
-def run(param, train_in, train_out):
+def run(param, train_in, train_out, test_in, test_out):
 
     lr = param['learn_rate']
     batch_size = param['batch_size']
@@ -32,12 +33,14 @@ def run(param, train_in, train_out):
     loss_func = torch.nn.CrossEntropyLoss()
 
     train = torch.utils.data.TensorDataset(train_in, train_out)
-    dataloader_train = torch.utils.data.DataLoader(train, batch_size)
+    train_data = torch.utils.data.DataLoader(train, batch_size)
 
- 
+    test = torch.utils.data.TensorDataset(test_in, test_out)
+    test_data = torch.utils.data.DataLoader(test, batch_size)
+
 
     for epoch in range(num_epoch):
-        for i, (signals_t, labels_t) in enumerate(train_loader):
+        for i, (signals_t, labels_t) in enumerate(train_data):
             out = model.forward(signals_t)
             optimizer.zero_grad()
                 
@@ -45,11 +48,17 @@ def run(param, train_in, train_out):
             loss.backward()
             optimizer.step()
                 
+            with torch.no_grad():
+                for (signals_test, labels_test) in test_data:
+                    output = model.forward((signals_t))
+                    test_loss = loss(labels_test, output)
 
             if epoch%display_epoch==1:
-                print("Loss: {:.4f}".format(loss))
+                print("Training Loss: {:.4f}".format(loss))
+                print("Test Loss: {:.4f}".format(test_loss))
     
-    print("Final Loss: {:.4f}".format(loss))
+    print("Final Training Loss: {:.4f}".format(loss))
+    print("Final Test Loss: {:.4f}".format(test_loss))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Implementation of Bayesian Neural Network
@@ -64,6 +73,6 @@ if __name__ == '__main__':
         params = json.load(f)
     f.close()
 
-    signals, labels = gd.get_data(args.data, 500)
+    signals, labels = get_data(args.data, 500)
     run(params, signals, labels)
 
