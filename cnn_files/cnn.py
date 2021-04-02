@@ -42,6 +42,11 @@ if __name__ == '__main__':
 
     # Loading training data
     X, y = get_data(args.data, n_train + n_valid)
+
+    # Batch normalization
+    X = normalize(X)
+
+    # Training/validation split
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=n_valid)
     X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
     X_valid = X_valid.reshape(X_valid.shape[0], X_valid.shape[1], 1)
@@ -65,16 +70,16 @@ if __name__ == '__main__':
     model.add(Dropout(rate=dropout))
     model.add(Activation(tf.keras.activations.relu))
     model.add(Dense(1))
+    model.add(Activation(tf.keras.activations.sigmoid))
 
     # Initializing loss function, optimizer, and performance metrics
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     optimizer = tf.keras.optimizers.Adam(lr=learn_rate)
     metrics = ['accuracy', 'AUC']
 
     # Training and evaluating model
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
     training_results = model.fit(X_train, y_train, epochs=n_epochs, batch_size=batch_size, verbose=args.v, validation_data=(X_valid, y_valid))
-    print(training_results.history)
 
     # model.evaluate(X_test, y_test, batch_size=batch_size, verbose=args.v)
 
