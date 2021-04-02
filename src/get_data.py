@@ -164,8 +164,8 @@ def get_data(files_path, n_output, site='Hanford'):
     """
     files_list = os.listdir(files_path)
     data_files = [file for file in files_list if file.split('.')[-1] in ['hdf', 'hdf5', 'h5', 'he5']]
-    signals_list = [_get_data_from_file(path + f'\\{file}')[0] for file in files_list]
-    labels_list = [_get_data_from_file(path + f'\\{file}')[1] for file in files_list]
+    signals_list = [_get_data_from_file(files_path + f'\\{file}')[0] for file in files_list]
+    labels_list = [_get_data_from_file(files_path + f'\\{file}')[1] for file in files_list]
     all_signals = np.concatenate(signals_list)
     all_labels = np.concatenate(labels_list)
 
