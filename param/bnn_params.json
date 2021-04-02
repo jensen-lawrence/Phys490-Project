@@ -2,5 +2,6 @@
     "learn_rate": 0.001,
     "n_epoch": 100,
     "batch_size": 50,
-    "display_epoch": 10
+    "display_epoch": 10,
+    "n_valid": 50
 }
