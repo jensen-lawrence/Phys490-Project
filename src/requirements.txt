@@ -1,0 +1,9 @@
+h5py
+matplotlib
+numpy
+pandas
+scipy
+torch
+tqdm
+blitz-bayesian-pytorch
+tensorflow

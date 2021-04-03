@@ -1,6 +1,7 @@
 {
     "learn_rate": 0.001,
-    "n_epoch": 100,
-    "batch_size": 50,
+    "num_epoch": 100,
+    "train_batch_size": 50,
+    "test_batch_size": 20,
     "display_epoch": 10
 }

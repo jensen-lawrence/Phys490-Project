@@ -2,8 +2,8 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 import sys
-sys.path.append('../src')
-import get_data
+sys.path.append('.')
+from get_data import *
 import json
 import argparse
 import blitz
@@ -17,10 +17,11 @@ from bnn import bnn
 # Run Data Through BNN model
 # ----------------------------------------------------------------------------------------------------------------------
 
-def run(param, train_in, train_out, test_in, test_out):
+def run(param, train_in, train_out):
 
     lr = param['learn_rate']
-    batch_size = param['batch_size']
+    batch_size = param['train_batch_size']
+    batch_size = param['test_batch_size']
     num_epoch = param['num_epoch']
     display_epoch = param['display_epoch']
     in_dim = train_in.shape[0]
@@ -28,15 +29,15 @@ def run(param, train_in, train_out, test_in, test_out):
     sample_nbr = 3
 
     
-    model = bnn(in_dim, out_dim)
+    model = bnn()
     optimizer = optim.SGD(model.parameters(), lr)
     loss_func = torch.nn.CrossEntropyLoss()
 
     train = torch.utils.data.TensorDataset(train_in, train_out)
-    train_data = torch.utils.data.DataLoader(train, batch_size)
+    train_data = torch.utils.data.DataLoader(train, train_batch_size)
 
-    test = torch.utils.data.TensorDataset(test_in, test_out)
-    test_data = torch.utils.data.DataLoader(test, batch_size)
+    test = torch.utils.data.TensorDataset(train_in, train_out)
+    test_data = torch.utils.data.DataLoader(test, test_batch_size)
 
 
     for epoch in range(num_epoch):
@@ -66,9 +67,9 @@ def run(param, train_in, train_out, test_in, test_out):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Description goes here')
-    parser.add_argument('--param', type='str', help='Path where Params are stored')
-    parser.add_argument('--data', type='str', help='Path where data is stored')
-
+    parser.add_argument('--param', type=str, help='Path where Params are stored')
+    parser.add_argument('--data', type=str, help='Path where data is stored')
+    args=parser.parse_args()
     with open(args.param) as f:
         params = json.load(f)
     f.close()

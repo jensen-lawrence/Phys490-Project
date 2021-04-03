@@ -8,7 +8,7 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as functional
 import torch.optim as optim
-from blitz.modules import BayesianLinear, BayesianCov1d
+from blitz.modules import BayesianLinear, BayesianConv1d
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -19,12 +19,12 @@ class bnn(nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = BayesianConv1d(16, 16)
-        self.conv2 = BayesianConv1d(32, 8)
-        self.conv3 = BayesianConv1d(64, 8)
+        self.conv1 = BayesianConv1d(1,1,(16, 16))
+        self.conv2 = BayesianConv1d(1,1,(32, 8))
+        self.conv3 = BayesianConv1d(1,1,(64, 8))
         self.fc1   = BayesianLinear(256, 120)
         self.fc2   = BayesianLinear(120, 84)
-        self.fc3   = BayesianLinear(84, 10)
+        self.fc3   = BayesianLinear(84, 2)
 
     def forward(self, x):
         out = F.relu(self.conv1(x))

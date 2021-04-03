@@ -11,7 +11,7 @@ from sklearn.preprocessing import normalize
 import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Activation, Conv1D, Dense, Dropout, Flatten, MaxPool1D
-sys.path.append('../src')
+sys.path.append('.')
 from get_data import get_data
 
 
