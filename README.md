@@ -22,7 +22,7 @@ Built with:
 
 ### Data generation ###
 
-[### CNN ###](https://github.com/jensen-lawrence/Phys490-Project/blob/main/cnn_files/cnn.py)
+### [CNN](https://github.com/jensen-lawrence/Phys490-Project/blob/main/cnn_files/cnn.py) ###
 
 ### BayseianCNN ###
 
