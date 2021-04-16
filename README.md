@@ -4,7 +4,7 @@ Group 7: Michael Astwood, Madison Buitenhuis, Jensen Lawrence, Catie Terrey
 
 ## Introduction ##
 
-This project follows the paper  "Improved deep learning techniques in gravitational-wave data analysis" by H. Xia et. Al. We will be recreating a convolutional neural network with batch normalization, dropout, and weight decay which classifies signals from spin allifned black hole mergers. In addition to this we will construct a bayesian convolutional neural network and compare the results from each netwrok. 
+This project follows the paper  "Improved deep learning techniques in gravitational-wave data analysis" by H. Xia et. Al. We will be recreating a convolutional neural network with batch normalization, dropout, and weight decay which classifies signals from spin aligned black hole mergers. In addition to this we will construct a bayesian convolutional neural network and compare the results from each network. 
 
 ## Packages Used ##
 Built with: 
@@ -18,14 +18,13 @@ Built with:
 * Blitz
 
 
-
 ## How to Use ##
 
 ### [Data generation](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation) ###
 
-### [CNN](https://github.com/jensen-lawrence/Phys490-Project/blob/main/cnn_files/cnn.py) ###
+### [CNN](https://github.com/jensen-lawrence/Phys490-Project/tree/main/cnn_files) ###
 
-### [BayseianCNN](https://github.com/jensen-lawrence/Phys490-Project/blob/main/bnn_files/bnn.py) ###
+### [BayseianCNN](https://github.com/jensen-lawrence/Phys490-Project/tree/main/bnn_files) ###
 
 ## Resources / Credits ##
 
