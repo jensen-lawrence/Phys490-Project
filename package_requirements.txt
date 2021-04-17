@@ -1,0 +1,40 @@
+# for Generating Data
+(See Phys490-Project/data_generation/ggwd/requirements.txt for more detail)
+
+h5py
+lalsuite
+matplotlib
+numpy
+pandas
+PyCBC
+requests
+scipy
+six
+sphinx
+sphinx-rtd-theme
+sphinxcontrib-napoleon
+tqdm
+
+# For CNN
+
+argparse
+h5py
+json
+matplotlib
+numpy
+os
+Pytorch
+sklearn
+sys
+
+# For Bayesian CNN
+
+argparse
+Blitz
+h5py
+json
+numpy
+os
+pytorch
+sklearn
+sys
