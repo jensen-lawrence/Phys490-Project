@@ -2,86 +2,53 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 
-import sys
-import json
-import argparse
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import normalize
-import tensorflow as tf
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Activation, Conv1D, Dense, Dropout, Flatten, MaxPool1D
-sys.path.append('../src')
-from get_data import get_data
+import torch
+import torch.nn as nn
+import torch.nn.functional as func
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Implementation of Convolution Neural Network
 # ----------------------------------------------------------------------------------------------------------------------
 
-if __name__ == '__main__':
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
 
-    # Implementing argument parser
-    parser = argparse.ArgumentParser(description='Description goes here')
-    parser.add_argument('--param', type=str)
-    parser.add_argument('--data', type=str)
-    parser.add_argument('-v', type=int)
-    args = parser.parse_args()
+        self.batchnorm1 = nn.BatchNorm1d(1)
+        self.batchnorm2 = nn.BatchNorm1d(16)
+        self.batchnorm3 = nn.BatchNorm1d(32)
+        self.batchnorm4 = nn.BatchNorm1d(64)
 
-    # Loading neural network parameters
-    with open(args.param) as f:
-        nn_params = json.load(f)
-    f.close()
+        self.conv1 = nn.Conv1d(1, 16, 16)
+        self.conv2 = nn.Conv1d(16, 32, 8)
+        self.conv3 = nn.Conv1d(32, 64, 8)
 
-    n_train = nn_params['n_train']
-    n_valid = nn_params['n_valid']
-    dropout = nn_params['dropout']
-    learn_rate = nn_params['learn_rate']
-    n_epochs = nn_params['n_epochs']
-    batch_size = nn_params['batch_size']
+        self.fc1 = nn.Linear(3904, 64)
+        self.fc2 = nn.Linear(64, 1)
 
-    # Loading training data
-    X, y = get_data(args.data, n_train + n_valid)
+        self.maxpool = nn.MaxPool1d(4, stride=4)
+        self.dropout = nn.Dropout(0.2)
 
-    # Batch normalization
-    X = normalize(X)
+    def forward(self, x):
+        x = self.batchnorm1(x)
+        x = self.conv1(x)
+        x = nn.ReLU()(self.maxpool(x))
+        x = self.batchnorm2(x)
+        x = self.conv2(x)
+        x = nn.ReLU()(self.maxpool(x))
+        x = self.batchnorm3(x)
+        x = self.conv3(x)
+        x = nn.ReLU()(self.maxpool(x))
+        x = self.batchnorm4(x)
+        x = x.reshape(x.shape[0], x.shape[1]*x.shape[2])
+        x = nn.ReLU()(self.dropout(self.fc1(x)))
+        x = nn.Sigmoid()(self.fc2(x))
+        return x
 
-    # Training/validation split
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=n_valid)
-    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
-    X_valid = X_valid.reshape(X_valid.shape[0], X_valid.shape[1], 1)
-    y_train = y_train.reshape(y_train.size, 1, 1)
-    y_valid = y_valid.reshape(y_valid.size, 1, 1)
-    input_shape = X_train.shape[1:]
-
-    # Initializing convolutional neural network
-    model = Sequential()
-    model.add(Conv1D(16, 16, input_shape=input_shape))
-    model.add(MaxPool1D(pool_size=4))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(Conv1D(32, 8))
-    model.add(MaxPool1D(pool_size=4))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(Conv1D(64, 8))
-    model.add(MaxPool1D(pool_size=4))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Dropout(rate=dropout))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(Dense(1))
-    model.add(Activation(tf.keras.activations.sigmoid))
-
-    # Initializing loss function, optimizer, and performance metrics
-    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-    optimizer = tf.keras.optimizers.Adam(lr=learn_rate)
-    metrics = ['accuracy', 'AUC']
-
-    # Training and evaluating model
-    model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    training_results = model.fit(X_train, y_train, epochs=n_epochs, batch_size=batch_size, verbose=args.v, validation_data=(X_valid, y_valid))
-
-    # model.evaluate(X_test, y_test, batch_size=batch_size, verbose=args.v)
+    def reset(self):
+        self.fc1.reset_parameters()
+        self.fc2.reset_parameters()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
