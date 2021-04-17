@@ -41,14 +41,7 @@ Main paper: https://arxiv.org/pdf/2011.04418.pdf
 
 Data generation reference paper: https://journals.aps.org/prd/pdf/10.1103/PhysRevD.100.063015
 
-Blitz Baayesian Deep learning package: @misc{esposito2020blitzbdl,
-    author = {Piero Esposito},
-    title = {BLiTZ - Bayesian Layers in Torch Zoo (a Bayesian Deep Learing library for Torch)},
-    year = {2020},
-    publisher = {GitHub},
-    journal = {GitHub repository},
-    howpublished = {\url{https://github.com/piEsposito/blitz-bayesian-deep-learning/}},
-}
+BLiTZ - Bayesian Layers in Torch Zoo (a Bayesian Deep Learing library for Torch)}: https://github.com/piEsposito/blitz-bayesian-deep-learning 
 
 Package provided by reference paper: https://github.com/timothygebhard/ggwd
 

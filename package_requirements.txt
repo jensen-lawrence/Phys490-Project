@@ -31,7 +31,7 @@ time
 # For Bayesian CNN
 
 argparse
-Blitz
+Blitz *
 h5py
 json
 numpy
@@ -39,3 +39,7 @@ os
 pytorch
 sklearn
 sys
+
+
+*To properly install Blitz please follow the instructions written in the following git repo:
+https://github.com/piEsposito/blitz-bayesian-deep-learning
