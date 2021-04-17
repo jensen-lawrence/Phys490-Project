@@ -17,7 +17,7 @@ import torch.nn as nn
 import torch.nn.functional as func
 sys.path.append('../src')
 from get_data import get_data
-from new_cnn import CNN
+from cnn import CNN
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -25,6 +25,9 @@ from new_cnn import CNN
 # ----------------------------------------------------------------------------------------------------------------------
 
 def run_model(params, X_train, y_train, X_valid, y_valid, X_test=None, y_test=None):
+    """
+    Docstring goes here
+    """
     learn_rate = params['learn_rate']
     n_epochs = params['n_epochs']
     batch_size = params['batch_size']
@@ -33,21 +36,23 @@ def run_model(params, X_train, y_train, X_valid, y_valid, X_test=None, y_test=No
     device = torch.device('cpu')
 
     train = torch.utils.data.TensorDataset(X_train, y_train)
-    train_data = torch.utils.data.DataLoader(train, batch_size)
+    train_data = torch.utils.data.DataLoader(train, batch_size, shuffle=True)
 
     valid = torch.utils.data.TensorDataset(X_valid, y_valid)
-    valid_data = torch.utils.data.DataLoader(valid, batch_size)
+    valid_data = torch.utils.data.DataLoader(valid, batch_size, shuffle=True)
 
     model = CNN()
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
     loss_func = nn.BCELoss(reduction='mean')
-    train_loss_vals = []
-    valid_loss_vals = []
+    train_loss_vals, train_acc_vals, train_auc_vals = [], [], []
+    valid_loss_vals, valid_acc_vals, valid_auc_vals = [], [], []
 
+    t_train = time.time()
     print('-'*80)
     print('Training model...')
     print('-'*80)
     for epoch in range(n_epochs):
+        t_epoch = time.time()
         model.train()
         train_loss, train_acc, train_auc = 0, 0, 0
         valid_loss, valid_acc, valid_auc = 0, 0, 0
@@ -82,9 +87,31 @@ def run_model(params, X_train, y_train, X_valid, y_valid, X_test=None, y_test=No
                 print(f'- Training accuracy: {step_train_acc:.4f} \tValidation accuracy: {step_valid_acc:.4f}')
                 print(f'- Training AUC score: {step_train_auc:.4f} \tValidation AUC score: {step_valid_auc:.4f}')
 
+        train_loss_vals.append(train_loss/batch_size)
+        train_acc_vals.append(train_acc/batch_size)
+        train_auc_vals.append(train_auc/batch_size)
+        valid_loss_vals.append(valid_loss/(batch_size * len(valid_data.dataset)))
+        valid_acc_vals.append(valid_acc/(batch_size * len(valid_data.dataset)))
+        valid_auc_vals.append(valid_auc/(batch_size * len(valid_data.dataset)))
+
+        print('-'*80)
+        print(f'EPOCH {epoch + 1} COMPLETE')
+        print(f'Average training loss: {train_loss/batch_size:.4f} \tAverage validation loss: {valid_loss/(batch_size * len(valid_data.dataset)):.4f}')
+        print(f'Average training accuracy: {train_acc/batch_size:.4f} \tAverage validation accuracy: {valid_acc/(batch_size * len(valid_data.dataset)):.4f}')
+        print(f'Average training AUC score: {train_auc/batch_size:.4f} \tAverage validation AUC score: {valid_auc/(batch_size * len(valid_data.dataset)):.4f}')
+        print(f'Time elapsed: {(time.time() - t_epoch)//60} min {(time.time() - t_epoch) % 60} sec')
+        print('-'*80)
+
         if (epoch + 1) % 10 == 0:
             learn_rate /= 10.0
             optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    print('TRAINING COMPLETE. SUMMARY OF RESULTS:')
+    print(f'Final training loss: {train_loss_vals[-1]:.4f} \tFinal validation loss: {valid_loss_vals[-1]:.4f}')
+    print(f'Final training accuracy: {train_acc_vals[-1]:.4f} \tFinal validation accuracy: {valid_acc_vals[-1]:.4f}')
+    print(f'Final training AUC score: {train_auc_vals[-1]:.4f} \tFinal validation AUC score: {valid_auc_vals[-1]:.4f}')
+    print(f'Time elapsed: {(time.time() - t_train)//60} min {(time.time() - t_train) % 60} sec')
+    print('-'*80)
 
     return 0
 
