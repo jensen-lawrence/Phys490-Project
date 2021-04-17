@@ -13,23 +13,23 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Activation, Conv1D, Dense, Dropout, Flatten, MaxPool1D
 from tensorflow.keras.layers import BatchNormalization
 sys.path.append('.')
-
+from cnn_funcs import *
 from get_data import get_data
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Implementation of Convolution Neural Network
 # ----------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
     # Implementing argument parser
     parser = argparse.ArgumentParser(description='Description goes here')
-    parser.add_argument('--param', type=str)
-    parser.add_argument('--data', type=str)
-    parser.add_argument('-v', type=int)
+    parser.add_argument('--param',default='param/cnn_params.json', type=str)
+    parser.add_argument('--data',default='F:\phys490_data\data_1_training', type=str)
+    parser.add_argument('-v',default=2, type=int)
     args = parser.parse_args()
-
+    
     # Loading neural network parameters
     with open(args.param) as f:
         nn_params = json.load(f)
@@ -41,6 +41,9 @@ if __name__ == '__main__':
     learn_rate = nn_params['learn_rate']
     n_epochs = nn_params['n_epochs']
     batch_size = nn_params['batch_size']
+    weight_decay = nn_params['weight_decay']
+
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="./logs")
 
     # Loading training data
     X, y = get_data(args.data, n_train + n_valid)
@@ -57,35 +60,21 @@ if __name__ == '__main__':
     input_shape = X_train.shape[1:]
 
     # Initializing convolutional neural network
-    model = Sequential()
-    model.add(Conv1D(16, 16, input_shape=input_shape))
-    model.add(MaxPool1D(pool_size=4))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(BatchNormalization())
-    model.add(Conv1D(32, 8))
-    model.add(MaxPool1D(pool_size=4))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(BatchNormalization())
-    model.add(Conv1D(64, 8))
-    model.add(MaxPool1D(pool_size=4))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(BatchNormalization())
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Dropout(rate=dropout))
-    model.add(Activation(tf.keras.activations.relu))
-    model.add(BatchNormalization())
-    model.add(Dense(1))
-    model.add(Activation(tf.keras.activations.sigmoid))
+    model=get_model(input_shape,dropout)
 
     # Initializing loss function, optimizer, and performance metrics
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     optimizer = tf.keras.optimizers.Adam(lr=learn_rate)
     metrics = ['accuracy', 'AUC']
+    
+    for i, layer in enumerate(model.layers):
+        tf.summary.histogram('layer{0}'.format(i), layer)
 
     # Training and evaluating model
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-    training_results = model.fit(X_train, y_train, epochs=n_epochs, batch_size=batch_size, verbose=args.v, validation_data=(X_valid, y_valid))
+    training_results = model.fit(X_train, y_train, epochs=n_epochs, 
+        batch_size=batch_size, verbose=args.v, validation_data=(X_valid, y_valid),
+        callbacks=[tensorboard_callback,tf.keras.callbacks.LearningRateScheduler(learning_rate_callback)])
 
     # model.evaluate(X_test, y_test, batch_size=batch_size, verbose=args.v)
 

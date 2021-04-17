@@ -1,8 +1,9 @@
 {
     "n_train": 5000,
     "n_valid": 500,
-    "dropout": 0.4,
-    "learn_rate": 5e-5,
-    "n_epochs": 1000,
-    "batch_size": 50
+    "dropout": 0.3,
+    "learn_rate": 7e-5,
+    "n_epochs": 100,
+    "batch_size": 25,
+    "weight_decay":1e-4
 }
