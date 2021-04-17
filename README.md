@@ -8,7 +8,7 @@ This project follows the paper  "Improved deep learning techniques in gravitatio
 
 ## Packages Used ##
 
-Please see [requiements]() for a list of packages used.
+Please see [requiements](https://github.com/jensen-lawrence/Phys490-Project/blob/main/package_requirements.txt) for a list of packages used.
 
 ## How to Use ##
 
