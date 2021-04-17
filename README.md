@@ -27,7 +27,7 @@ To use our CNN tool...
 
 To use our Bayesian CNN tool foloow these steps:
 
-1. Follow the steps to geenerate data above and save the generated data.
+1. Follow the steps to generate data above and save the generated data.
 
 2. Obtain the path of the generated data. For example purposes we will call this data_path
 
@@ -41,7 +41,7 @@ Main paper: https://arxiv.org/pdf/2011.04418.pdf
 
 Data generation reference paper: https://journals.aps.org/prd/pdf/10.1103/PhysRevD.100.063015
 
-BLiTZ - Bayesian Layers in Torch Zoo (a Bayesian Deep Learing library for Torch)}: https://github.com/piEsposito/blitz-bayesian-deep-learning 
+BLiTZ - Bayesian Layers in Torch Zoo (a Bayesian Deep Learing library for Torch): https://github.com/piEsposito/blitz-bayesian-deep-learning 
 
 Package provided by reference paper: https://github.com/timothygebhard/ggwd
 
