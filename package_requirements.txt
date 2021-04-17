@@ -26,6 +26,7 @@ os
 Pytorch
 sklearn
 sys
+time
 
 # For Bayesian CNN
 
