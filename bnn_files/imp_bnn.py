@@ -2,7 +2,7 @@
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
 import sys
-sys.path.append('../src')
+sys.path.insert(0,'../src')
 import get_data
 import json
 import argparse
@@ -73,6 +73,8 @@ if __name__ == '__main__':
         params = json.load(f)
     f.close()
 
-    signals, labels = get_data(args.data, 500)
-    run(params, signals, labels)
+    n_valid = nn_params['n_valid']
 
+    signals, labels = get_data(args.data, 500)
+    x_train, x_valid, y_train, y_valid = train_test_split(signals, labels, test_size=n_valid)
+    run(params, x_train, y_train, x_valid, y_valid)
