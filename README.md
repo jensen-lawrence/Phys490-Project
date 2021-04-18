@@ -12,7 +12,7 @@ Please see [requiements](https://github.com/jensen-lawrence/Phys490-Project/blob
 
 ## How to Use ##
 
-To utilize this project, first clone this repo onto a device of your choice.
+To utilize this project, first clone this repo onto a device of your choice. Please ensure you have all the packages used installed before attempting to run any code (see above for list).
 
 Please note that the folders containing each section are linked accordingly to the subtitles in this section.
 
@@ -27,11 +27,11 @@ To use our CNN tool...
 
 To use our Bayesian CNN tool foloow these steps:
 
-1. Follow the steps to geenerate data above and save the generated data
+1. Follow the steps to generate data above and save the generated data.
 
-2. obtain the path of the generated data. For example purposes we will call this data_path
+2. Obtain the path of the generated data. For example purposes we will call this data_path
 
-3. In the terminal run python3 imp_bnn.py --param param\bnn_params.json --data data_path
+3. In the terminal run python3 imp_bnn.py --param param\bnn_params.json --data data_path.
 
 4. Adjust the parameters in [bnn_params](https://github.com/jensen-lawrence/Phys490-Project/blob/main/param/bnn_params.json) to your liking.
 
@@ -40,6 +40,8 @@ To use our Bayesian CNN tool foloow these steps:
 Main paper: https://arxiv.org/pdf/2011.04418.pdf
 
 Data generation reference paper: https://journals.aps.org/prd/pdf/10.1103/PhysRevD.100.063015
+
+BLiTZ - Bayesian Layers in Torch Zoo (a Bayesian Deep Learing library for Torch): https://github.com/piEsposito/blitz-bayesian-deep-learning 
 
 Package provided by reference paper: https://github.com/timothygebhard/ggwd
 
