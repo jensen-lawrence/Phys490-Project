@@ -64,27 +64,22 @@ class CNN(nn.Module):
     def forward(self, x):
         # First convolution block
         x = self.conv1(x)
-        x = self.batchnorm1(x)
-        x = func.relu(x)
+        x = func.relu(self.batchnorm1(x))
         x = self.maxpool(x)
 
         # Second convolution block
         x = self.conv2(x)
-        x = self.batchnorm2(x)
-        x = func.relu(x)
+        x = func.relu(self.batchnorm2(x))
         x = self.maxpool(x)
 
         # Third convolution block
         x = self.conv3(x)
-        x = self.batchnorm3(x)
-        x = func.relu(x)
+        x = func.relu(self.batchnorm3(x))
         x = self.maxpool(x)
 
         # First fully-connected block
         x = x.view(x.size(0), -1)
-        x = self.fc1(x)
-        x = func.relu(x)
-        x = self.dropout(x)
+        x = self.dropout(func.relu(self.fc1(x)))
 
         # Output
         x = self.fc2(x)
