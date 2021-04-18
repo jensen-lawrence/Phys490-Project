@@ -2,7 +2,7 @@
     "n_train": 5000,
     "n_valid": 500,
     "learn_rate": 5e-5,
-    "n_epochs": 100,
+    "n_epochs": 30,
     "batch_size": 25,
-    "display_every": 50
+    "validate_every": 20
 }
