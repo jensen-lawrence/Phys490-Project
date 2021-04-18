@@ -12,40 +12,87 @@ import torch.nn.functional as func
 # ----------------------------------------------------------------------------------------------------------------------
 
 class CNN(nn.Module):
+    """
+    Convolutional neural network for the classification of gravitation wave signals.
+
+    Structure
+    ---------
+    Input
+    1D Convolution - input channels: 1, output channels: 16, kernel size: 16
+    Batch Normalization
+    ReLU
+    1D Max Pooling - kernel size: 4, stride: 4
+    1D Convolution - input channels: 16, output channels: 32, kernel size: 8
+    Batch Normalization
+    ReLU
+    1D Max Pooling - kernel size: 4, stride: 4
+    1D Convolution - input channels: 32, output channels: 64, kernel size: 8
+    Batch Normalization
+    ReLU
+    1D Max Pooling - kernel size: 4, stride: 4
+    Flatten
+    Fully-Connected - input features: 3904, output features: 64
+    ReLU
+    Dropout - dropout probability: 0.5
+    Fully-Connected - input features: 64, output features: 1
+    Sigmoid
+    Output
+    """
     def __init__(self):
         super(CNN, self).__init__()
 
-        self.batchnorm1 = nn.BatchNorm1d(1)
-        self.batchnorm2 = nn.BatchNorm1d(16)
-        self.batchnorm3 = nn.BatchNorm1d(32)
-        self.batchnorm4 = nn.BatchNorm1d(64)
+        # Convolutional layers
+        self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=16)
+        self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=8)
+        self.conv3 = nn.Conv1d(in_channels=32, out_channels=64, kernel_size=8)
 
-        self.conv1 = nn.Conv1d(1, 16, 16)
-        self.conv2 = nn.Conv1d(16, 32, 8)
-        self.conv3 = nn.Conv1d(32, 64, 8)
+        # Fully-connected layers
+        self.fc1 = nn.Linear(in_features=3904, out_features=64)
+        self.fc2 = nn.Linear(in_features=64, out_features=1)
 
-        self.fc1 = nn.Linear(3904, 64)
-        self.fc2 = nn.Linear(64, 1)
+        # Batch normalization
+        self.batchnorm1 = nn.BatchNorm1d(num_features=16)
+        self.batchnorm2 = nn.BatchNorm1d(num_features=32)
+        self.batchnorm3 = nn.BatchNorm1d(num_features=64)
 
-        self.maxpool = nn.MaxPool1d(4, stride=4)
-        self.dropout = nn.Dropout(0.2)
+        # Additional methods
+        self.maxpool = nn.MaxPool1d(kernel_size=4, stride=4)
+        self.dropout = nn.Dropout(p=0.5)
 
+
+    # Feedforward function
     def forward(self, x):
-        x = self.batchnorm1(x)
+        # First convolution block
         x = self.conv1(x)
-        x = nn.ReLU()(self.maxpool(x))
-        x = self.batchnorm2(x)
+        x = self.batchnorm1(x)
+        x = func.relu(x)
+        x = self.maxpool(x)
+
+        # Second convolution block
         x = self.conv2(x)
-        x = nn.ReLU()(self.maxpool(x))
-        x = self.batchnorm3(x)
+        x = self.batchnorm2(x)
+        x = func.relu(x)
+        x = self.maxpool(x)
+
+        # Third convolution block
         x = self.conv3(x)
-        x = nn.ReLU()(self.maxpool(x))
-        x = self.batchnorm4(x)
-        x = x.reshape(x.shape[0], x.shape[1]*x.shape[2])
-        x = nn.ReLU()(self.dropout(self.fc1(x)))
-        x = nn.Sigmoid()(self.fc2(x))
+        x = self.batchnorm3(x)
+        x = func.relu(x)
+        x = self.maxpool(x)
+
+        # First fully-connected block
+        x = x.view(x.size(0), -1)
+        x = self.fc1(x)
+        x = func.relu(x)
+        x = self.dropout(x)
+
+        # Output
+        x = self.fc2(x)
+        x = torch.sigmoid(x)
         return x
 
+
+    # Reset fully-connected layers
     def reset(self):
         self.fc1.reset_parameters()
         self.fc2.reset_parameters()
