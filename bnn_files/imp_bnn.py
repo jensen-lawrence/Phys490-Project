@@ -6,7 +6,7 @@ sys.path.insert(0,'../src')
 import get_data
 import json
 import argparse
-import blitz
+import blitz,torch
 import numpy as np
 from blitz.utils import variational_estimator
 from sklearn.model_selection import train_test_split
@@ -17,19 +17,25 @@ from bnn import bnn
 # Run Data Through BNN model
 # ----------------------------------------------------------------------------------------------------------------------
 
-def run(param, train_in, train_out, test_in, test_out):
+def acc(labels,output)
+    output=torch.round(output).cpu().detach().numpy()
+    labels=labels.cpu().detach().numpy()
+    numequal = np.equal(output,labels).size
+    return numequal/labels.size
 
+def run(param, train_in, train_out, test_in, test_out):
+    device = torch.device('cuda')
     lr = param['learn_rate']
     batch_size = param['batch_size']
     num_epoch = param['num_epoch']
     display_epoch = param['display_epoch']
+
     in_dim = train_in.shape[0]
     out_dim = train_out.shape[0]
     sample_nbr = 3
 
-    
     model = bnn(in_dim, out_dim)
-    optimizer = optim.SGD(model.parameters(), lr)
+    optimizer = optim.Adam(model.parameters(), lr)
     loss_func = torch.nn.CrossEntropyLoss()
 
     train = torch.utils.data.TensorDataset(train_in, train_out)
@@ -50,12 +56,16 @@ def run(param, train_in, train_out, test_in, test_out):
                 
             with torch.no_grad():
                 for (signals_test, labels_test) in test_data:
-                    output = model.forward((signals_t))
-                    test_loss = loss(labels_test, output)
+                    signals_test=signals_test.to(device)
+                    labels_test=labels_test.to(device)
 
-            if epoch%display_epoch==1:
-                print("Training Loss: {:.4f}".format(loss))
-                print("Test Loss: {:.4f}".format(test_loss))
+                    output = model.forward(signals_t)
+                    test_loss = loss(labels_test, output)
+                    test_accuracy = acc(labels_test,output)
+
+        #if epoch % display_epoch==1:
+        print("Training Loss: {:.4f}".format(loss))
+        print("Test Loss: {:.4f}".format(test_loss))
     
     print("Final Training Loss: {:.4f}".format(loss))
     print("Final Test Loss: {:.4f}".format(test_loss))
@@ -77,4 +87,11 @@ if __name__ == '__main__':
 
     signals, labels = get_data(args.data, 500)
     x_train, x_valid, y_train, y_valid = train_test_split(signals, labels, test_size=n_valid)
+
+    train = torch.utils.data.TensorDataset(x_train, y_train)
+    train_data = torch.utils.data.DataLoader(train, batch_size, shuffle=True)
+
+    valid = torch.utils.data.TensorDataset(x_valid, y_valid)
+    valid_data = torch.utils.data.DataLoader(valid, batch_size, shuffle=True)
+    
     run(params, x_train, y_train, x_valid, y_valid)
