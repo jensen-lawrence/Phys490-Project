@@ -32,7 +32,7 @@ def run(param, train_in, train_out, test_in, test_out):
     batch_size = param['batch_size']
     num_epoch = param['n_epoch']
     display_epoch = param['display_epoch']
-
+    cw=1e-7
     sample_nbr = 3
 
     model = bnn().to(device)
@@ -57,7 +57,7 @@ def run(param, train_in, train_out, test_in, test_out):
             #print(out.cpu().detach().numpy())
             optimizer.zero_grad()
                 
-            loss = model.sample_elbo(signals_t, labels_t, loss_func, sample_nbr)
+            loss = model.sample_elbo(signals_t, labels_t, loss_func, sample_nbr,complexity_cost_weight=cw)
             loss.backward()
             optimizer.step() 
             loss_val+=loss.item()/(batch_size*len(train_data))
@@ -71,11 +71,11 @@ def run(param, train_in, train_out, test_in, test_out):
                 signals_test=signals_test.to(device)
                 labels_test=labels_test.to(device)
                 output = model.forward(signals_t)
-                test_loss += model.sample_elbo(signals_test, labels_test, loss_func, sample_nbr)/(batch_size*len(test_data))
+                test_loss += model.sample_elbo(signals_test, labels_test, loss_func, sample_nbr,complexity_cost_weight=cw)/(batch_size*len(test_data))
                 test_accuracy += acc(labels_test, output)/len(test_data) 
         test_acc_vals.append(test_accuracy)
 
-        if epoch % 5 == 0 and epoch<21:
+        if epoch % 25 == 0:
             lr /= 10.0
             for g in optimizer.param_groups:
                 g['lr'] = lr
