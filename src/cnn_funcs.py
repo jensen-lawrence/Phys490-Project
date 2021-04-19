@@ -21,8 +21,8 @@ def get_model(input_shape,dropout):
     model.add(BatchNormalization())
 
     model.add(Flatten())
-    model.add(Dense(64))
     model.add(Dropout(rate=dropout))
+    model.add(Dense(64))
     model.add(Activation(tf.keras.activations.relu))
     model.add(BatchNormalization())
 
