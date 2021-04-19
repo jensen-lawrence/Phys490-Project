@@ -5,6 +5,7 @@ from tensorflow.keras.layers import BatchNormalization
 
 def get_model(input_shape,dropout):
     model = Sequential()
+    #model.add(Dropout(rate=dropout))
     model.add(Conv1D(16, 16, input_shape=input_shape))
     model.add(MaxPool1D(pool_size=4,strides=4))
     model.add(Activation(tf.keras.activations.relu))

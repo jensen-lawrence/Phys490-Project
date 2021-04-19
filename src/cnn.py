@@ -15,7 +15,7 @@ from tensorflow.keras.layers import BatchNormalization
 sys.path.append('.')
 from cnn_funcs import *
 from get_data import get_data
-
+from tensorflow_addons.optimizers import AdamW
 # ----------------------------------------------------------------------------------------------------------------------
 # Implementation of Convolution Neural Network
 # ----------------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # Implementing argument parser
     parser = argparse.ArgumentParser(description='Description goes here')
     parser.add_argument('--param',default='param/cnn_params.json', type=str)
-    parser.add_argument('--data',default='F:\phys490_data\data_1_training', type=str)
+    parser.add_argument('--data',default='F:\phys490_data\data_2_training', type=str)
     parser.add_argument('-v',default=2, type=int)
     args = parser.parse_args()
     
@@ -63,8 +63,8 @@ if __name__ == '__main__':
     model=get_model(input_shape,dropout)
 
     # Initializing loss function, optimizer, and performance metrics
-    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-    optimizer = tf.keras.optimizers.Adam(lr=learn_rate)
+    loss = tf.keras.losses.BinaryCrossentropy(from_logits=False)
+    optimizer = AdamW(weight_decay=weight_decay,learning_rate=learn_rate)
     metrics = ['accuracy', 'AUC']
     
     for i, layer in enumerate(model.layers):
