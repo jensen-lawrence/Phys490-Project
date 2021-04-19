@@ -9,12 +9,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from blitz.modules import BayesianLinear, BayesianConv1d
-
+from blitz.utils import variational_estimator
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Define Bayesian Neural Network
 # ----------------------------------------------------------------------------------------------------------------------
 
+@variational_estimator
 class bnn(nn.Module):
 
     def __init__(self):
@@ -28,16 +29,17 @@ class bnn(nn.Module):
         self.fc2   = BayesianLinear(64, 1)
 
     def forward(self, x):
-        out = self.dropout(x)
-        out = F.relu(self.conv1(out))
+        
+        out = F.relu(self.conv1(x))
         out = F.max_pool1d(out,4)
         out = F.relu(self.conv2(out))
         out = F.max_pool1d(out,4)
         out = F.relu(self.conv3(out))
         out = F.max_pool1d(out,4)
         out = out.view(out.size(0), -1)
+        out = self.dropout(out)
         out = F.relu(self.fc1(out))
-        out = torch.sigmoid(self.fc2(out))
+        out = t.sigmoid(self.fc2(out))
         return out
     
     def reset(self):

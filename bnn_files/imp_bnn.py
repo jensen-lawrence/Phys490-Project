@@ -21,9 +21,9 @@ from bnn import bnn
 # ----------------------------------------------------------------------------------------------------------------------
 
 def acc(labels,output):
-    output=torch.round(output).cpu().detach().numpy()
-    labels=labels.cpu().detach().numpy()
-    numequal = np.equal(output,labels).size
+    output=torch.round(output).cpu().detach().numpy().astype(int)
+    labels=labels.cpu().detach().numpy().astype(int)
+    numequal = np.sum(np.equal(output,labels).astype(int))
     return numequal/labels.size
 
 def run(param, train_in, train_out, test_in, test_out):
@@ -38,7 +38,7 @@ def run(param, train_in, train_out, test_in, test_out):
     model = bnn().to(device)
     optimizer = optim.Adam(model.parameters(), lr)
     loss_func = torch.nn.BCELoss()
-
+    complexity=model.nn_kl_divergence()
     train = torch.utils.data.TensorDataset(train_in, train_out)
     train_data = torch.utils.data.DataLoader(train, batch_size)
 
@@ -55,15 +55,15 @@ def run(param, train_in, train_out, test_in, test_out):
         for i, (signals_t, labels_t) in enumerate(train_data):
             signals_t=signals_t
             out = model.forward(signals_t)
+            #print(out.cpu().detach().numpy())
             optimizer.zero_grad()
                 
-            #loss = model.sample_elbo(signals_t, labels_t, loss_func, sample_nbr)
-            loss = loss_func(out,labels_t)
+            loss = model.sample_elbo(signals_t, labels_t, loss_func, sample_nbr)
             loss.backward()
             optimizer.step() 
-            loss_val+=loss.item()/len(train_data)
-            acc_val+=acc(labels_t,out)
-        accuracy_vals.append(acc_val/len(train_data))
+            loss_val+=loss.item()/(batch_size*len(train_data))
+            acc_val+=acc(labels_t,out)/len(train_data)
+        accuracy_vals.append(acc_val)
             
         test_accuracy=0
         test_loss=0
@@ -73,13 +73,20 @@ def run(param, train_in, train_out, test_in, test_out):
                 labels_test=labels_test.to(device)
 
                 output = model.forward(signals_t)
-                test_loss += loss_func(output,labels_test).item()
-                test_accuracy += acc(labels_test, output)
-        test_acc_vals.append(test_accuracy/len(test_data))
+                test_loss += loss_func(output,labels_test).item()/(batch_size*len(test_data))
+                test_accuracy += acc(labels_test, output)/len(test_data) 
+        test_acc_vals.append(test_accuracy)
+
+        if epoch % 5 == 0:
+            lr /= 10.0
+            for g in optimizer.param_groups:
+                g['lr'] = lr
 
         #if epoch % display_epoch==1:
         print("Training Loss: {:.4f}".format(loss_val))
         print("Test Loss: {:.4f}".format(test_loss))
+        print("Training Accuracy: {:.4f}".format(acc_val))
+        print("Test Accuracy: {:.4f}".format(test_accuracy))
     
     print("Final Training Loss: {:.4f}".format(loss))
     print("Final Test Loss: {:.4f}".format(test_loss))

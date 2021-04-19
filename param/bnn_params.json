@@ -1,5 +1,5 @@
 {
-    "learn_rate": 5e-4,
+    "learn_rate": 5e-2,
     "n_epoch": 100,
     "batch_size": 25,
     "display_epoch": 20,
