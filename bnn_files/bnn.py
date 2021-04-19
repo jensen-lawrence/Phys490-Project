@@ -27,18 +27,26 @@ class bnn(nn.Module):
         self.conv3 = BayesianConv1d(32,64, 8)
         self.fc1   = BayesianLinear(3904, 64)
         self.fc2   = BayesianLinear(64, 1)
+        self.batch_norm1 = nn.BatchNorm1d(num_features=16)
+        self.batch_norm2 = nn.BatchNorm1d(num_features=32)
+        self.batch_norm3 = nn.BatchNorm1d(num_features=64)
+        self.batch_norm4 = nn.BatchNorm1d(num_features=64)
 
     def forward(self, x):
         
-        out = F.relu(self.conv1(x))
-        out = F.max_pool1d(out,4)
-        out = F.relu(self.conv2(out))
-        out = F.max_pool1d(out,4)
-        out = F.relu(self.conv3(out))
-        out = F.max_pool1d(out,4)
+        out = self.conv1(x)
+        out = F.relu(F.max_pool1d(out,4))
+        out = self.batch_norm1(out)   
+        out = self.conv2(out)
+        out = F.relu(F.max_pool1d(out,4))
+        out = self.batch_norm2(out)
+        out = self.conv3(out)
+        out = F.relu(F.max_pool1d(out,4))
+        out = self.batch_norm3(out)
         out = out.view(out.size(0), -1)
         out = self.dropout(out)
         out = F.relu(self.fc1(out))
+        out = self.batch_norm4(out)
         out = t.sigmoid(self.fc2(out))
         return out
     

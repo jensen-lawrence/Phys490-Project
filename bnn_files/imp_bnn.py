@@ -53,7 +53,6 @@ def run(param, train_in, train_out, test_in, test_out):
         loss_val=0
         acc_val=0
         for i, (signals_t, labels_t) in enumerate(train_data):
-            signals_t=signals_t
             out = model.forward(signals_t)
             #print(out.cpu().detach().numpy())
             optimizer.zero_grad()
@@ -71,13 +70,12 @@ def run(param, train_in, train_out, test_in, test_out):
             for (signals_test, labels_test) in test_data:
                 signals_test=signals_test.to(device)
                 labels_test=labels_test.to(device)
-
                 output = model.forward(signals_t)
-                test_loss += loss_func(output,labels_test).item()/(batch_size*len(test_data))
+                test_loss += model.sample_elbo(signals_test, labels_test, loss_func, sample_nbr)/(batch_size*len(test_data))
                 test_accuracy += acc(labels_test, output)/len(test_data) 
         test_acc_vals.append(test_accuracy)
 
-        if epoch % 5 == 0:
+        if epoch % 5 == 0 and epoch<21:
             lr /= 10.0
             for g in optimizer.param_groups:
                 g['lr'] = lr
@@ -87,6 +85,7 @@ def run(param, train_in, train_out, test_in, test_out):
         print("Test Loss: {:.4f}".format(test_loss))
         print("Training Accuracy: {:.4f}".format(acc_val))
         print("Test Accuracy: {:.4f}".format(test_accuracy))
+        print("-"*40)
     
     print("Final Training Loss: {:.4f}".format(loss))
     print("Final Test Loss: {:.4f}".format(test_loss))
