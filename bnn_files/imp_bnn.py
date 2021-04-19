@@ -13,6 +13,7 @@ import torch.optim as optim
 import torch.functional as F
 from blitz.utils import variational_estimator
 from sklearn.model_selection import train_test_split
+from torchvision.transforms.functional import normalize
 from bnn import bnn
 
 
@@ -106,16 +107,12 @@ if __name__ == '__main__':
     n_valid = params['n_valid']
     batch_size=params['batch_size']
     signals, labels = get_data(args.data, 5500)
-    x_train, x_valid, y_train, y_valid = train_test_split(signals, labels, test_size=n_valid)
-    x_train = torch.from_numpy(x_train.reshape(x_train.shape[0], 1, x_train.shape[1])).float().to(device)
-    x_valid = torch.from_numpy(x_valid.reshape(x_valid.shape[0], 1, x_valid.shape[1])).float().to(device)
-    y_train = torch.from_numpy(y_train.reshape(y_train.size, 1)).float().to(device)
-    y_valid = torch.from_numpy(y_valid.reshape(y_valid.size, 1)).float().to(device)
 
-    train = torch.utils.data.TensorDataset(x_train, y_train)
-    train_data = torch.utils.data.DataLoader(train, batch_size, shuffle=True)
-
-    valid = torch.utils.data.TensorDataset(x_valid, y_valid)
-    valid_data = torch.utils.data.DataLoader(valid, batch_size, shuffle=True)
+    # Training/validation split
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=n_valid)
+    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
+    X_valid = X_valid.reshape(X_valid.shape[0], X_valid.shape[1], 1)
+    y_train = y_train.reshape(y_train.size, 1, 1)
+    y_valid = y_valid.reshape(y_valid.size, 1, 1)
     
-    run(params, x_train, y_train, x_valid, y_valid)
+    run(params, X_train, y_train, X_valid, y_valid)
