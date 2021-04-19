@@ -36,7 +36,7 @@ def run(param, train_in, train_out, test_in, test_out):
     cw=1e-7
     sample_nbr = 3
 
-    model = bnn().to(device)
+    model = bnn().to(device).float()
     optimizer = optim.Adam(model.parameters(), lr)
     loss_func = torch.nn.BCELoss()
     complexity=model.nn_kl_divergence()
@@ -71,7 +71,7 @@ def run(param, train_in, train_out, test_in, test_out):
             for (signals_test, labels_test) in test_data:
                 signals_test=signals_test.to(device)
                 labels_test=labels_test.to(device)
-                output = model.forward(signals_t)
+                output = model.forward(signals_test)
                 test_loss += model.sample_elbo(signals_test, labels_test, loss_func, sample_nbr,complexity_cost_weight=cw)/(batch_size*len(test_data))
                 test_accuracy += acc(labels_test, output)/len(test_data) 
         test_acc_vals.append(test_accuracy)
@@ -110,9 +110,9 @@ if __name__ == '__main__':
     signals=normalize(signals)
     # Training/validation split
     X_train, X_valid, y_train, y_valid = train_test_split(signals,labels, test_size=n_valid)
-    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
-    X_valid = X_valid.reshape(X_valid.shape[0], X_valid.shape[1], 1)
-    y_train = y_train.reshape(y_train.size, 1, 1)
-    y_valid = y_valid.reshape(y_valid.size, 1, 1)
+    X_train = torch.from_numpy(X_train.reshape(X_train.shape[0], 1, X_train.shape[1])).to(device).float()
+    X_valid = torch.from_numpy(X_valid.reshape(X_valid.shape[0], 1, X_valid.shape[1])).to(device).float()
+    y_train = torch.from_numpy(y_train.reshape(y_train.size, 1)).to(device).float()
+    y_valid = torch.from_numpy(y_valid.reshape(y_valid.size, 1)).to(device).float()
     
     run(params, X_train, y_train, X_valid, y_valid)

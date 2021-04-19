@@ -32,8 +32,8 @@ class bnn(nn.Module):
         self.batch_norm3 = nn.BatchNorm1d(num_features=64)
 
     def forward(self, x):
-        
-        out = self.conv1(x)
+        out = self.dropout(x)
+        out = self.conv1(out)
         out = F.relu(F.max_pool1d(out,4,stride=4))
         out = self.batch_norm1(out)   
         out = self.conv2(out)
