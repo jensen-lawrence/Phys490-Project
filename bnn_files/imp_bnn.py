@@ -13,7 +13,7 @@ import torch.optim as optim
 import torch.functional as F
 from blitz.utils import variational_estimator
 from sklearn.model_selection import train_test_split
-from torchvision.transforms.functional import normalize
+from sklearn.preprocessing import normalize
 from bnn import bnn
 
 
@@ -107,9 +107,9 @@ if __name__ == '__main__':
     n_valid = params['n_valid']
     batch_size=params['batch_size']
     signals, labels = get_data(args.data, 5500)
-
+    signals=normalize(signals)
     # Training/validation split
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=n_valid)
+    X_train, X_valid, y_train, y_valid = train_test_split(signals,labels, test_size=n_valid)
     X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
     X_valid = X_valid.reshape(X_valid.shape[0], X_valid.shape[1], 1)
     y_train = y_train.reshape(y_train.size, 1, 1)
