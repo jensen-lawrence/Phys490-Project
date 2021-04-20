@@ -54,7 +54,7 @@ def bnn_train(param, data_path, v, results_dir, test_dir='NONE'):
     """
 
     # internal variable to enable testing mode
-    if not(test_dir=='NONE')
+    if not(test_dir=='NONE'):
         testing_mode=True
     else:
         testing_mode=False
