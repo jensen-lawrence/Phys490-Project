@@ -9,6 +9,7 @@ import argparse
 # Custom imports
 sys.path.append('src')
 from run_cnn import cnn_main
+from run_bnn import bnn_train
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Program Execution
@@ -31,7 +32,12 @@ if __name__ == '__main__':
     assert args.model in ('BNN', 'CNN'), 'Invalid model chosen.'
 
     if args.model == 'BNN':
-        pass
+        bnn_train(
+            param = args.param,
+            train_data = args.train,
+            v = args.v,
+            results_dir = args.res
+        )
 
     elif args.model == 'CNN':
         cnn_main(
