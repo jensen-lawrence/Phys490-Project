@@ -63,6 +63,14 @@ def get_cnn_test(test_data, n_test):
     y_test = y.reshape(y.size, 1, 1)
     return X_test, y_test
 
+# Per-class accuracy
+def per_class_accuracy(labels, predictions, class_label):
+    assert len(labels) == len(predictions), 'Mismatched label and prediction size.'
+    class_label_idx = np.where(labels==class_label)
+    preds_at_idx = predictions[class_label_idx]
+    correct = len([i for i in preds_at_idx if i == class_label])
+    return correct/len(class_label_idx[0])
+
 # Train, validate, and test the CNN
 def run_cnn(params, train_data, v, test_data=''):
     """
@@ -111,19 +119,39 @@ def run_cnn(params, train_data, v, test_data=''):
         validation_data = (X_valid, y_valid),
         callbacks = [tensorboard_callback, lr_callback]
     )
-    print('-'*80)
-    print('TRAINING RESULTS')
-    print(f'Final training loss: {training_results.history["loss"][-1]:.4f}')
-    print(f'Final training accuracy: {training_results.history["accuracy"][-1]:.4f}')
-    print(f'Final training AUC score: {training_results.history["auc"][-1]:.4f}')
-    print(f'Final validation loss: {training_results.history["val_loss"][-1]:.4f}')
-    print(f'Final validation accuracy: {training_results.history["val_accuracy"][-1]:.4f}')
-    print(f'Final validation AUC score: {training_results.history["val_auc"][-1]:.4f}')
-    print('-'*80)
-    
+
     # Determining final training and validation predictions
     train_pred = model.predict(X_train)
     valid_pred = model.predict(X_valid)
+
+    # Reshaping true and predicted labels
+    y_train = y_train.reshape(y_train.shape[0])
+    train_pred = train_pred.reshape(train_pred.shape[0])
+    y_valid = y_valid.reshape(y_valid.shape[0])
+    valid_pred = valid_pred.reshape(valid_pred.shape[0])
+
+    # Determining per-class accuracy
+    train_noise_acc = per_class_accuracy(y_train, np.around(train_pred), 0)
+    train_gw_acc = per_class_accuracy(y_train, np.around(train_pred), 1)
+    valid_noise_acc = per_class_accuracy(y_valid, np.around(valid_pred), 0)
+    valid_gw_acc = per_class_accuracy(y_valid, np.around(valid_pred), 1)
+
+    # Printing results
+    print('-'*80)
+    print('TRAINING RESULTS')
+    print('Training:')
+    print(f'- Loss: {training_results.history["loss"][-1]:.4f}')
+    print(f'- Noise accuracy: {train_noise_acc:.4f}')
+    print(f'- Gravitational wave accuracy: {train_gw_acc:.4f}')
+    print(f'- Total accuracy: {training_results.history["accuracy"][-1]:.4f}')
+    print(f'- AUC score: {training_results.history["auc"][-1]:.4f}')
+    print('Validation:')
+    print(f'- Loss: {training_results.history["val_loss"][-1]:.4f}')
+    print(f'- Noise accuracy: {valid_noise_acc:.4f}')
+    print(f'- Gravitational wave accuracy: {valid_gw_acc:.4f}')
+    print(f'- Total accuracy: {training_results.history["val_accuracy"][-1]:.4f}')
+    print(f'- AUC score: {training_results.history["val_auc"][-1]:.4f}')
+    print('-'*80)
 
     # Testing if provided with testing data
     if test_data != '':
@@ -136,7 +164,7 @@ def run_cnn(params, train_data, v, test_data=''):
         print('TESTING RESULTS')
         print(f'Loss: {test_results[0]:.4f}')
         print(f'Accuracy: {test_results[1]:.4f}')
-        print(f'AUC Score: {test_results[2]:.4f}')
+        print(f'AUC score: {test_results[2]:.4f}')
         print('-'*80)
 
     return training_results, y_train, train_pred, y_valid, valid_pred
@@ -240,10 +268,6 @@ def cnn_main(params, train_data, v, results_dir, test_data=''):
     plot_cnn_metrics(training_results, save_as)
 
     # Plotting ROC curve
-    y_train = y_train.reshape(y_train.shape[0])
-    train_pred = train_pred.reshape(train_pred.shape[0])
-    y_valid = y_valid.reshape(y_valid.shape[0])
-    valid_pred = valid_pred.reshape(valid_pred.shape[0])
     plot_cnn_roc(y_train, train_pred, y_valid, valid_pred, save_as)
 
 # ----------------------------------------------------------------------------------------------------------------------
