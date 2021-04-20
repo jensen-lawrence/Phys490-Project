@@ -7,7 +7,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Activation, BatchNormalization, Conv1D, Dense, Dropout, Flatten, MaxPool1D
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Convolution Neural Network
+# Define Convolution Neural Network
 # ----------------------------------------------------------------------------------------------------------------------
 
 def CNN(input_shape, dropout):

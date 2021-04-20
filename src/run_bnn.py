@@ -1,27 +1,35 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # Imports
 # ----------------------------------------------------------------------------------------------------------------------
-import sys
-from get_data import get_data
 
+# General imports
+import sys
+import time
 import json
 import argparse
-import blitz,torch
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Machine learning imports
+import blitz
+import torch
 import torch.optim as optim
 import torch.functional as F
 from blitz.utils import variational_estimator
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, roc_auc_score
 from sklearn.preprocessing import normalize
+
+# Custom imports
+from get_data import get_data
 from bnn import bnn
-import seaborn as sns
-import matplotlib.pyplot as plt
-import time
+
 # ----------------------------------------------------------------------------------------------------------------------
-# Run Data Through BNN model
+# Run Data Through BNN Model
 # ----------------------------------------------------------------------------------------------------------------------
 
+# Accuracy
 def acc(labels,output):
     """
     Calculates accuracy of model predictions    
@@ -34,7 +42,7 @@ def acc(labels,output):
     numequal = np.sum(np.equal(output,labels).astype(int))
     return numequal/labels.size
 
-def bnn_train(param,data_path,v,results_dir,test_dir='NONE'):
+def bnn_train(param, data_path, v, results_dir, test_dir='NONE'):
     """
     Trains bayesian convolutional neural network
     Inputs:
@@ -388,13 +396,4 @@ def bnn_train(param,data_path,v,results_dir,test_dir='NONE'):
     print('-'*80)
     plt.close()
 
-#debugging setup
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Description goes here')
-    parser.add_argument('--param',default='../param/bnn_params.json', type=str, help='Path where params are stored')
-    parser.add_argument('--train',default='F:\phys490_data\data_2_training',type=str, help='Path where data is stored')
-    parser.add_argument('--test',default='F:\phys490_data\data_1_testing',type=str, help='Path where test data is stored')
-    parser.add_argument('--res',default='../results',type=str, help='Path where results are stored')
-    parser.add_argument('-v',default=2,type=int, help='Verbosity')
-    args=parser.parse_args()
-    bnn_train(args.param,args.v,args.train,args.res,args.test)
+# ----------------------------------------------------------------------------------------------------------------------

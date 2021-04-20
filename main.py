@@ -31,12 +31,14 @@ if __name__ == '__main__':
 
     assert args.model in ('BNN', 'CNN'), 'Invalid model chosen.'
 
+    # Running models
     if args.model == 'BNN':
         bnn_train(
             param = args.param,
-            train_data = args.train,
+            data_path = args.train,
             v = args.v,
-            results_dir = args.res
+            results_dir = args.res,
+            test_dir = args.test 
         )
 
     elif args.model == 'CNN':

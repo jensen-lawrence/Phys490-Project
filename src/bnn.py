@@ -60,20 +60,29 @@ class bnn(nn.Module):
         self.batch_norm4 = nn.BatchNorm1d(num_features=64)
 
     def forward(self, x):
+        # First convolution block
         out = self.dropout(x)
         out = self.conv1(out)
         out = F.relu(F.max_pool1d(out,4))
         out = self.batch_norm1(out)   
+
+        # Second convolution block
         out = self.conv2(out)
         out = F.relu(F.max_pool1d(out,4))
         out = self.batch_norm2(out)
+
+        # Third convolution block
         out = self.conv3(out)
         out = F.relu(F.max_pool1d(out,4))
         out = self.batch_norm3(out)
+
+        # Fully-connected layer
         out = out.view(out.size(0), -1)
         out = self.dropout(out)
         out = F.relu(self.fc1(out))
         out = self.batch_norm4(out)
+
+        # Output
         out = t.sigmoid(self.fc2(out))
         return out
     
@@ -84,3 +93,5 @@ class bnn(nn.Module):
         self.fc1.reset_parameters()
         self.fc2.reset_parameters()
         self.fc3.reset_parameters()
+
+# ----------------------------------------------------------------------------------------------------------------------
