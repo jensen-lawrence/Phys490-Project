@@ -14,7 +14,7 @@ Please see [`requirements.txt`](https://github.com/jensen-lawrence/Phys490-Proje
 
 ## Setup ##
 
-To utilize this project, first clone this repo onto a device of your choice. Next, install all of the packages listed in [`requirements.txt`](https://github.com/jensen-lawrence/Phys490-Project/blob/main/package_requirements.txt). Finally, generate the training and testing data sets using the scripts `generate_training_data.py` and `generate_testing_data.py` provided under [`data_generation/ggwd`](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation/ggwd). Further instructions are provided in this folder's README file.
+To utilize this project, first clone this repo onto a device of your choice. Next, install all of the packages listed in [`requirements.txt`](https://github.com/jensen-lawrence/Phys490-Project/blob/main/package_requirements.txt). Finally, generate the training and testing data sets using the scripts `generate_training_data.py` and `generate_testing_data.py` provided under [`data_generation/ggwd`](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation/ggwd). Further instructions are provided in the README under [`data_generation`](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation).
 
 ## Usage ##
 
