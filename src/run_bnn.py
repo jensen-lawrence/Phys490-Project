@@ -42,7 +42,7 @@ def acc(labels,output):
     numequal = np.sum(np.equal(output,labels).astype(int))
     return numequal/labels.size
 
-def bnn_train(param, data_path, v, results_dir, test_dir='NONE'):
+def bnn_train(param, data_path, v, results_dir, test_dir=''):
     """
     Trains bayesian convolutional neural network
     Inputs:
@@ -54,7 +54,7 @@ def bnn_train(param, data_path, v, results_dir, test_dir='NONE'):
     """
 
     # internal variable to enable testing mode
-    if not(test_dir=='NONE'):
+    if not(test_dir==''):
         testing_mode=True
     else:
         testing_mode=False
