@@ -247,12 +247,3 @@ def cnn_main(params, train_data, v, results_dir, test_data=''):
     plot_cnn_roc(y_train, train_pred, y_valid, valid_pred, save_as)
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-
-params = '../param/cnn_params.json'
-train_data = '../../gw_data/training_1'
-v = 1
-results_dir = '../results'
-test_data = '../../gw_data/testing_1'
-
-cnn_main(params, train_data, v, results_dir, test_data=test_data)
