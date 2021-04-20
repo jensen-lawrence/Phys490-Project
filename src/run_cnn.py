@@ -55,7 +55,7 @@ def get_cnn_train_valid(train_data, n_train, n_valid):
 def get_cnn_test(test_data, n_test):
     """
     Using the gravitational wave simulation data in the .hdf files at the path test_data, a set of testing data and
-    labels oflength n_test is returned.
+    labels of length n_test is returned.
     """
     X, y = get_data(test_data, n_test)
     X = normalize(X)
@@ -65,6 +65,9 @@ def get_cnn_test(test_data, n_test):
 
 # Per-class accuracy
 def per_class_accuracy(labels, predictions, class_label):
+    """
+    Returns how well predictions matches labels for a given class_label.
+    """
     assert len(labels) == len(predictions), 'Mismatched label and prediction size.'
     class_label_idx = np.where(labels==class_label)
     preds_at_idx = predictions[class_label_idx]
