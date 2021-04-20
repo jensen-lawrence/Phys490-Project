@@ -1,9 +1,9 @@
 # Data Generation
 
 We use the package 'generate gravitational-wave data' by Timothy Gebhard.
-The folder `ggwd` contains a clone of the package from https://github.com/timothygebhard/ggwd.
+The folder [`ggwd`](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation/ggwd) contains a clone of the package from https://github.com/timothygebhard/ggwd.
 
-To recreate the testing and training data sets described in [Xia et al., 2020](https://arxiv.org/pdf/2011.04418.pdf), we have included the following additional scripts under `ggwd`:
+To recreate the testing and training data sets described in [Xia et al., 2020](https://arxiv.org/pdf/2011.04418.pdf), we have included the following additional scripts under [`ggwd`](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation/ggwd):
  - generate_testing_data.py
  - generate_training_data.py
 
