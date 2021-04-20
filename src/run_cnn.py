@@ -25,13 +25,22 @@ from cnn import CNN
 # Implementation of Convolution Neural Network
 # ----------------------------------------------------------------------------------------------------------------------
 
+# Learning rate callback
 def learning_rate_callback(epoch, learn_rate):
+    """
+    Callback function for reducing learning rate during training.
+    """
     if epoch % 20 == 0:
         return learn_rate/2
     else:
         return learn_rate
 
+# Get training and validation data for the CNN
 def get_cnn_train_valid(train_data, n_train, n_valid):
+    """
+    Using the gravitational wave simulation data in the .hdf files at the path train_data, a set of training data and
+    labels of length n_train and a set of validation data and labels of length n_valid is returned.
+    """
     X, y = get_data(train_data, n_train + n_valid)
     X = normalize(X)
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=n_valid)
@@ -42,13 +51,19 @@ def get_cnn_train_valid(train_data, n_train, n_valid):
     input_shape = X_train.shape[1:]
     return X_train, X_valid, y_train, y_valid, input_shape
 
+# Get testing data for the CNN
 def get_cnn_test(test_data, n_test):
+    """
+    Using the gravitational wave simulation data in the .hdf files at the path test_data, a set of testing data and
+    labels oflength n_test is returned.
+    """
     X, y = get_data(test_data, n_test)
     X = normalize(X)
     X_test = X.reshape(X.shape[0], X.shape[1], 1)
     y_test = y.reshape(y.size, 1, 1)
     return X_test, y_test
 
+# Train, validate, and test the CNN
 def run_cnn(params, train_data, v, test_data=''):
     """
     Using the hyperparameters in params, run_cnn trains and validates the CNN in cnn.py using the data in train_data.
@@ -130,7 +145,12 @@ def run_cnn(params, train_data, v, test_data=''):
 # Plotting Results
 # ----------------------------------------------------------------------------------------------------------------------
 
+# Plotting CNN performance metrics
 def plot_cnn_metrics(training_results, save_as):
+    """
+    Generates plots of the loss, accuracy, and AUC scores for the training and validation results from training the CNN.
+    """
+    # Getting performance metrics
     train_loss = training_results.history['loss']
     train_acc = training_results.history['accuracy']
     train_auc = training_results.history['auc']
@@ -141,6 +161,8 @@ def plot_cnn_metrics(training_results, save_as):
     epochs = range(1, len(train_loss) + 1)
     sns.set_style('whitegrid')
 
+    # Plotting loss
+    print('Plotting performance metrics...')
     plt.figure(figsize=(12, 8))
     ax1 = sns.lineplot(x=epochs, y=train_loss, color='dodgerblue', label='Training')
     ax1 = sns.lineplot(x=epochs, y=valid_loss, color='springgreen', label='Validation')
@@ -148,7 +170,9 @@ def plot_cnn_metrics(training_results, save_as):
     ax1.set_ylabel('Loss', fontsize=16)
     ax1.legend(loc='best', fontsize=16)
     plt.savefig(save_as + 'loss.png', dpi=400)
+    print('Plotted training and validation loss.')
 
+    # Plotting accuracy
     plt.figure(figsize=(12, 8))
     ax2 = sns.lineplot(x=epochs, y=train_acc, color='dodgerblue', label='Training')
     ax2 = sns.lineplot(x=epochs, y=valid_acc, color='springgreen', label='Validation')
@@ -156,7 +180,9 @@ def plot_cnn_metrics(training_results, save_as):
     ax2.set_ylabel('Accuracy', fontsize=16)
     ax2.legend(loc='best', fontsize=16)
     plt.savefig(save_as + 'accuracy.png', dpi=400)
+    print('Plotted training and validation accuracy.')
 
+    # Plotting AUC score
     plt.figure(figsize=(12, 8))
     ax3 = sns.lineplot(x=epochs, y=train_auc, color='dodgerblue', label='Training')
     ax3 = sns.lineplot(x=epochs, y=valid_auc, color='springgreen', label='Validation')
@@ -164,34 +190,48 @@ def plot_cnn_metrics(training_results, save_as):
     ax3.set_ylabel('AUC Score', fontsize=16)
     ax3.legend(loc='best', fontsize=16)
     plt.savefig(save_as + 'auc_score.png', dpi=400)
-    plt.show()
+    print('Plotted training and validation AUC score.')
+    print('-'*80)
     plt.close()
 
+# Plotting CNN ROC curves
 def plot_cnn_roc(y_train, train_pred, y_valid, valid_pred, save_as):
+    """
+    Generates a plot of the ROC curve for the training and validation results from training the CNN.
+    """
+    # Getting training ROC curve
     train_roc = roc_curve(y_train, train_pred)
     fpr_train = train_roc[0]
     tpr_train = train_roc[1]
 
+    # Getting validation ROC curve
     valid_roc = roc_curve(y_valid, valid_pred)
     fpr_valid = valid_roc[0]
     tpr_valid = valid_roc[1]
 
+    # Plotting ROC curves
+    print('Plotting ROC curves...')
     sns.set_style('whitegrid')
     plt.figure(figsize=(12, 8))
-    ax = sns.lineplot(x=fpr_train, y=tpr_train, color='dodgerblue', label='Training')
-    ax = sns.lineplot(x=fpr_valid, y=tpr_valid, color='springgreen', label='Validation')
-    ax.set_xlabel('False Positive Rate', fontsize=16)
-    ax.set_ylabel('True Positive Rate', fontsize=16)
-    ax.legend(loc='best', fontsize=16)
+    plt.plot(fpr_train, tpr_train, color='dodgerblue', label='Training')
+    plt.plot(fpr_valid, tpr_valid, color='springgreen', label='Validation')
+    plt.xlabel('False Positive Rate', fontsize=16)
+    plt.ylabel('True Positive Rate', fontsize=16)
+    plt.legend(loc='best', fontsize=16)
     plt.savefig(save_as + 'roc_curve.png', dpi=400)
-    plt.show()
+    print('Plotted training and validation ROC curves.')
+    print('-'*80)
     plt.close()
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Convolutional Neural Network Function
 # ----------------------------------------------------------------------------------------------------------------------
 
+# Main CNN function
 def cnn_main(params, train_data, v, results_dir, test_data=''):
+    """
+    Main function for training, validating, and testing the CNN, and then plotting the results.
+    """
     # Training, validating, and testing CNN
     training_results, y_train, train_pred, y_valid, valid_pred = run_cnn(params, train_data, v, test_data=test_data)
 
@@ -206,19 +246,13 @@ def cnn_main(params, train_data, v, results_dir, test_data=''):
     valid_pred = valid_pred.reshape(valid_pred.shape[0])
     plot_cnn_roc(y_train, train_pred, y_valid, valid_pred, save_as)
 
-    train_roc = roc_curve(y_train, train_pred)
-    fpr_train = train_roc[0]
-    tpr_train = train_roc[1]
-    plt.plot(fpr_train, tpr_train)
-    plt.show()
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-params = 'param/cnn_params.json'
-train_data = '../gw_data/training_1'
+params = '../param/cnn_params.json'
+train_data = '../../gw_data/training_1'
 v = 1
-results_dir = 'results'
-test_data = '../gw_data/testing_1'
+results_dir = '../results'
+test_data = '../../gw_data/testing_1'
 
 cnn_main(params, train_data, v, results_dir, test_data=test_data)
