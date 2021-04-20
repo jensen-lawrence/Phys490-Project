@@ -1,4 +1,4 @@
-# for Generating Data
+# For Generating Data
 (See Phys490-Project/data_generation/ggwd/requirements.txt for more detail)
 
 h5py
@@ -17,16 +17,13 @@ tqdm
 
 # For CNN
 
-argparse
-h5py
 json
 matplotlib
 numpy
-os
-Pytorch
+seaborn
 sklearn
 sys
-time
+tensorflow
 
 # For Bayesian CNN
 
@@ -34,11 +31,21 @@ argparse
 Blitz *
 h5py
 json
+matplotlib
 numpy
 os
-pytorch
+seaborn
 sklearn
 sys
+time
+torch
+
+# For Data Extraction
+
+os
+h5py
+numpy
+sklearn
 
 
 *To properly install Blitz please follow the instructions written in the following git repo:
