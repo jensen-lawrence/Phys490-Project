@@ -65,9 +65,16 @@ def bnn_train(param,data_path,v,results_dir):
     train_preds=[]
 
     test_loss_vals=[]
-    test_acc_vals=[]
-    test_auc_vals=[]
-    test_preds=[]
+    test_min_acc_vals=[]
+    test_mean_acc_vals=[]
+    test_max_acc_vals=[]
+    test_min_auc_vals=[]
+    test_mean_auc_vals=[]
+    test_max_auc_vals=[]
+
+    test_meanpreds=[]
+    test_maxpreds=[]
+    test_minpreds=[]
     for epoch in range(num_epoch):
         loss_val=0
         acc_val=0
@@ -84,21 +91,36 @@ def bnn_train(param,data_path,v,results_dir):
             acc_val+=acc(labels_t,out)/len(train_data)
         accuracy_vals.append(acc_val)
         auc_vals.append(auc_val)
-        test_accuracy=0
+        test_mean_accuracy=0
+        test_max_accuracy=0
+        test_min_accuracy=0
         test_loss=0
-        test_auc_val=0
+        test_mean_auc_val=0
+        test_min_auc_val=0
+        test_max_auc_val=0
         with torch.no_grad():
             for (signals_test, labels_test) in test_data:
                 meanpreds,stdpreds = model.mfvi_forward(signals_test,sample_nbr)
-                print(meanpreds.cpu().detach().numpy().shape,stdpreds.cpu().detach().numpy().shape)
+                meanpreds,conf_int = (meanpreds.cpu().detach().numpy().shape,1.645*(1/np.sqrt(len(stdpreds)))*stdpreds.cpu().detach().numpy().shape)
+                maxpreds=meanpreds+conf_int
+                minpreds=meanpreds-conf_int
                 #predictions=torch.round(output).cpu().detach().numpy().astype(int)
-                test_preds.append(meanpreds)
-                test_auc_val += roc_auc_score(np.column_stack((torch.round(meanpreds).cpu().detach().numpy(),stdpreds.cpu().detach().numpy())),
-                    labels_test.cpu().detach().numpy())/len(test_data) 
+                test_meanpreds.append(meanpreds)
+                test_meanpreds.append(minpreds)
+                test_meanpreds.append(maxpreds)
+                test_mean_auc_val += roc_auc_score(labels_test.cpu().detach().numpy().astype(int),meanpreds)/len(test_data) 
+                test_max_auc_val += roc_auc_score(labels_test.cpu().detach().numpy().astype(int),maxpreds)/len(test_data) 
+                test_min_auc_val += roc_auc_score(labels_test.cpu().detach().numpy().astype(int),minpreds)/len(test_data) 
                 test_loss += model.sample_elbo(signals_test, labels_test, loss_func, sample_nbr,complexity_cost_weight=cw)/(batch_size*len(test_data))
-                test_accuracy += acc(labels_test, meanpreds)/len(test_data) 
-        test_acc_vals.append(test_accuracy)
-        test_auc_vals.append(test_auc_val)
+                test_mean_accuracy += acc(labels_test, meanpreds)/len(test_data) 
+                test_min_accuracy += acc(labels_test, minpreds)/len(test_data) 
+                test_max_accuracy += acc(labels_test, maxnpreds)/len(test_data) 
+        test_mean_acc_vals.append(test_mean_accuracy)
+        test_mean_auc_vals.append(test_mean_auc_val)
+        test_min_acc_vals.append(test_min_accuracy)
+        test_min_auc_vals.append(test_min_auc_val)
+        test_max_acc_vals.append(test_max_accuracy)
+        test_max_auc_vals.append(test_max_auc_val)
         if epoch % 5 == 0:
             lr /= 2.0
             for g in optimizer.param_groups:
@@ -113,30 +135,25 @@ def bnn_train(param,data_path,v,results_dir):
     print("Final Training Loss: {:.4f}".format(loss))
     print("Final Test Loss: {:.4f}".format(test_loss))
     training_results = {'train_loss': loss_vals,'test_loss':test_loss_vals,
-        'train_acc':accuracy_vals,'test_acc':test_acc_vals,
-        'train_auc':auc_vals,'test_auc':test_auc_vals}
-
-    
-
-    return training_results
-
-def plot_bnn_roc(y_train, train_pred, y_valid, valid_pred, save_as):
-    # Getting training ROC curve
-    train_roc = roc_curve(y_train, train_pred)
+        'train_acc':accuracy_vals,'test_acc':test_mean_acc_vals,
+        'train_auc':auc_vals,'test_auc':test_mean_auc_vals}
+    train_roc = roc_curve(train_out, train_preds.flatten())
     fpr_train = train_roc[0]
     tpr_train = train_roc[1]
 
     # Getting validation ROC curve
-    valid_roc = roc_curve(y_valid, valid_pred)
-    fpr_valid = valid_roc[0]
-    tpr_valid = valid_roc[1]
+    test_mean_roc = roc_curve(test_out, test_meanpredes.flatten())
+    fpr_test_mean = test_mean_roc[0]
+    tpr_test_mean = test_mean_roc[1]
 
     # Plotting ROC curves
     print('Plotting ROC curves...')
     sns.set_style('whitegrid')
     plt.figure(figsize=(12, 8))
     plt.plot(fpr_train, tpr_train, color='dodgerblue', label='Training')
-    plt.plot(fpr_valid, tpr_valid, color='springgreen', label='Validation')
+    plt.plot(fpr_test_mean, tpr_test_mean , color='springgreen', label='Validation (Mean)')
+    plt.plot(fpr_test_min, tpr_test_min , color='springgreen', label='Validation (Min)')
+    plt.plot(fpr_test_max, tpr_test_max , color='springgreen', label='Validation (Max)')
     plt.xlabel('False Positive Rate', fontsize=16)
     plt.ylabel('True Positive Rate', fontsize=16)
     plt.legend(loc='best', fontsize=16)
@@ -144,6 +161,31 @@ def plot_bnn_roc(y_train, train_pred, y_valid, valid_pred, save_as):
     print('Plotted training and validation ROC curves.')
     print('-'*80)
     plt.close()
+
+# def plot_bnn_roc(y_train, train_pred, y_valid, valid_pred, save_as):
+#     # Getting training ROC curve
+#     train_roc = roc_curve(y_train, train_pred)
+#     fpr_train = train_roc[0]
+#     tpr_train = train_roc[1]
+
+#     # Getting validation ROC curve
+#     valid_roc = roc_curve(y_valid, valid_pred)
+#     fpr_valid = valid_roc[0]
+#     tpr_valid = valid_roc[1]
+
+#     # Plotting ROC curves
+#     print('Plotting ROC curves...')
+#     sns.set_style('whitegrid')
+#     plt.figure(figsize=(12, 8))
+#     plt.plot(fpr_train, tpr_train, color='dodgerblue', label='Training')
+#     plt.plot(fpr_valid, tpr_valid, color='springgreen', label='Validation')
+#     plt.xlabel('False Positive Rate', fontsize=16)
+#     plt.ylabel('True Positive Rate', fontsize=16)
+#     plt.legend(loc='best', fontsize=16)
+#     plt.savefig(save_as + 'bnn_roc_curve.png', dpi=400)
+#     print('Plotted training and validation ROC curves.')
+#     print('-'*80)
+#     plt.close()
 
 def plot_bnn(training_params,testing_params):
     train_loss=training_params['train_loss']
