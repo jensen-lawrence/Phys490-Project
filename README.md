@@ -14,7 +14,7 @@ Please see [requiements](https://github.com/jensen-lawrence/Phys490-Project/blob
 
 To utilize this project, first clone this repo onto a device of your choice. Please ensure you have all the packages used installed before attempting to run any code (see above for list).
 
-Please note that the folders containing each section are linked accordingly to the subtitles in this section.
+Please note that the folders containing each code section are linked accordingly to the subtitles below.
 
 ### [Data generation](https://github.com/jensen-lawrence/Phys490-Project/tree/main/data_generation) ###
 
@@ -22,18 +22,27 @@ To use our data generation tool...
 
 ### [CNN](https://github.com/jensen-lawrence/Phys490-Project/tree/main/cnn_files) ###
 
-To use our CNN tool...
+To use our CNN tool foloow these steps:
+
+1. Follow the steps to generate data above and save the training and testing generated data.
+
+2. Obtain the path of the generated data. For example purposes we will call the training data path train_data and the testing data path test_data
+
+3. In the terminal run python3 main.py --model CNN --param param\cnn_params.json --train train_data --test test_data
+
+4. Adjust the parameters in [cnn_params](https://github.com/jensen-lawrence/Phys490-Project/blob/main/param/cnn_params.json) to your liking as well as the results path and verbosity in the terminal.
+
 ### [BayseianCNN](https://github.com/jensen-lawrence/Phys490-Project/tree/main/bnn_files) ###
 
 To use our Bayesian CNN tool foloow these steps:
 
-1. Follow the steps to generate data above and save the generated data.
+1. Follow the steps to generate data above and save the training and testing generated data.
 
-2. Obtain the path of the generated data. For example purposes we will call this data_path
+2. Obtain the path of the generated data. For example purposes we will call the training data path train_data and the testing data path test_data
 
-3. In the terminal run python3 imp_bnn.py --param param\bnn_params.json --data data_path.
+3. In the terminal run python3 main.py --model BNN --param param\bnn_params.json --train train_data --test test_data
 
-4. Adjust the parameters in [bnn_params](https://github.com/jensen-lawrence/Phys490-Project/blob/main/param/bnn_params.json) to your liking.
+4. Adjust the parameters in [bnn_params](https://github.com/jensen-lawrence/Phys490-Project/blob/main/param/bnn_params.json) to your liking as well as the results path and verbosity in the terminal.
 
 ## Resources / Credits ##
 
