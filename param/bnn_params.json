@@ -3,5 +3,6 @@
     "n_epoch": 100,
     "batch_size": 32,
     "display_epoch": 20,
-    "n_valid": 500
+    "n_valid": 500,
+    "device": "cuda"
 }
