@@ -18,7 +18,7 @@ To utilize this project, first clone this repo onto a device of your choice. Nex
 
 ## Usage ##
 
-To run this program, navigate to the `Phys490-Project` directory on the command line, i.e., `cd path/to/Phys490-Project`. Then, on the command line, run the command
+To run this program, navigate to the `phys490` directory on the command line, i.e., `cd path/to/phys490`. Then, on the command line, run the command
 ```
 python main.py --model MODEL --param path/to/model_params.json --train path/to/training_data --test path/to/test_data --res path/to/results -v V
 ```
